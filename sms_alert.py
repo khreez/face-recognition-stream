@@ -9,7 +9,12 @@ def send_intruder_alert():
     client = Client(account_sid, auth_token)
     message = client.messages.create(
         body='Intruder ALERT!\nUnknown person has entered the monitored area',
-        from_='+12563049692',
-        to='+526623294059'
+        # from_='+12563049692',
+        from_='whatsapp:',
+        to='whatsapp:'
     )
     print('Intruder alert sent with message id: %s' % message.sid)
+
+
+if __name__ == '__main__':
+    send_intruder_alert()
