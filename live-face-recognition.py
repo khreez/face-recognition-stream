@@ -12,11 +12,6 @@ alert_events = 0  # events counter
 alert_last_check = 0
 
 data = pickle.loads(open("./encoded_faces.pickle", "rb").read())
-# face_cascade = cv2.CascadeClassifier('/usr/local/anaconda3/share/OpenCV/haarcascades/haarcascade_frontalface_alt.xml')
-
-# fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-# writer = cv2.VideoWriter("./results/test-small-02.mp4",
-#                          fourcc, 24, (640, 480), True)
 
 stream = cv2.VideoCapture(0)
 
@@ -30,9 +25,6 @@ while True:
 
     boxes = face_recognition.face_locations(rgb, model='hog')
     encodings = face_recognition.face_encodings(rgb, boxes)
-
-    # boxes = face_cascade.detectMultiScale(gray, 1.3, 5)
-    # encodings = face_recognition.face_encodings(rgb, boxes)
 
     names = []
     for encoding in encodings:
@@ -81,13 +73,10 @@ while True:
         y = top - 15 if top - 15 > 15 else top + 15
         cv2.putText(frame, name, (left, y), cv2.FONT_HERSHEY_SIMPLEX, 0.75, colour, 2)
 
-    # writer.write(frame)
-
     cv2.imshow('frame', frame)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 stream.release()
-# writer.release()
 cv2.destroyAllWindows()
