@@ -52,7 +52,7 @@ while True:
         left = int(left * r)
 
         if name == 'Unknown':
-            colour = (0, 255, 0)
+            colour = (0, 0, 255)
 
             alert_events += 1
             if alert_events >= alert_threshold:
@@ -65,7 +65,7 @@ while True:
                     alert_events = 0
 
         else:
-            colour = (255, 0, 0)
+            colour = (0, 255, 0)
 
         cv2.rectangle(frame, (left, top), (right, bottom), colour, 2)
         y = top - 15 if top - 15 > 15 else top + 15
