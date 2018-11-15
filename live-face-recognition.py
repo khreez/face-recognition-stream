@@ -18,10 +18,8 @@ stream = cv2.VideoCapture(0)
 while True:
     _, frame = stream.read()
 
-    frame = imutils.resize(frame, width=640)
-
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    rgb = imutils.resize(rgb, width=750)
 
     boxes = face_recognition.face_locations(rgb, model='hog')
     encodings = face_recognition.face_encodings(rgb, boxes)
