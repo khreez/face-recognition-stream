@@ -28,8 +28,9 @@ while True:
     frame = vs.read()
     source = frame.copy()
 
-    cv2.putText(frame, 'Face enrollment mode', (1, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
-    cv2.imshow('Face enrollment mode', frame)
+    frame_message = 'Face enrollment mode'
+    cv2.putText(frame, frame_message, (1, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
+    cv2.imshow(frame_message, frame)
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("c"):
@@ -37,8 +38,8 @@ while True:
         cv2.imwrite(destination_file, source)
         source_sample_count += 1
 
-        message = 'Captured face image sample'
-        print(message)
+        capture_message = 'Captured face image sample'
+        print(capture_message)
         # cv2.putText(frame, message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
         time.sleep(2.0)
 
