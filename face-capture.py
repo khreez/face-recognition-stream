@@ -5,7 +5,7 @@ import time
 
 from imutils.video import VideoStream
 
-ENROLLED_DIR = 'enrolled'
+CAPTURE_DIR = 'capture'
 
 source_sample_count = 0
 augmented_sample_count = 0
@@ -17,7 +17,7 @@ args = vars(ap.parse_args())
 
 label = args["identifier"]
 
-label_path = os.path.join(ENROLLED_DIR, label)
+label_path = os.path.join(CAPTURE_DIR, label)
 if not os.path.exists(label_path):
     os.makedirs(label_path)
 
@@ -34,7 +34,7 @@ while True:
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("c"):
-        destination_file = os.path.sep.join([ENROLLED_DIR, label, "{}.jpg".format(str(source_sample_count).zfill(5))])
+        destination_file = os.path.sep.join([CAPTURE_DIR, label, "{}.jpg".format(str(source_sample_count).zfill(5))])
         cv2.imwrite(destination_file, source)
         source_sample_count += 1
 
