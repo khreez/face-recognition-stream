@@ -8,7 +8,6 @@ from imutils.video import VideoStream
 CAPTURE_DIR = 'capture'
 
 source_sample_count = 0
-augmented_sample_count = 0
 message_color = (0, 0, 255)
 
 ap = argparse.ArgumentParser()
