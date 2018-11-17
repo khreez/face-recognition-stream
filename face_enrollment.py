@@ -57,7 +57,8 @@ def get_labels():
     labels = []
     with os.scandir(CAPTURE_DIR) as it:
         for entry in it:
-            if entry.is_dir(): labels.append(entry.name)
+            if entry.is_dir():
+                labels.append(entry.name)
     return labels
 
 
@@ -65,7 +66,7 @@ def process_image(image_path):
     result = None
     if image_path.endswith('.jpg'):
         image = load_img(image_path)
-        # capture face area and store that in augmentation instead of orig image
+        # TODO capture face area and store that in augmentation instead of orig image
         image_array = img_to_array(image)
         result = image_array.reshape((1,) + image_array.shape)
     return result
