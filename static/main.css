@@ -1,0 +1,45 @@
+body {
+    font-family: sans-serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+video, canvas, img {
+    background-color: #ccc;
+    margin: 5px;
+    width: 100%;
+    vertical-align: top;
+}
+
+button {
+    margin: 10px;
+    width: 100px;
+}
+
+@media (max-width: 480px) {
+    button {
+        font-size: 0.8em;
+        width: calc(33% - 5px);
+    }
+}
+
+@media (max-width: 720px) {
+    video {
+        margin: 10px;
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+div.container {
+    margin: 0 auto;
+    max-width: 50%;
+}
+
+.actions {
+    text-align: center;
+}

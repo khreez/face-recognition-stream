@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Face Enrollment</title>
+
+    <link rel=stylesheet href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Take Enrollment Face Sample</h1>
+
+    <div class="actions">
+        <input id="labelField" name="label" type="text" placeholder="Nombre" required/>
+        <button id="takePhotoButton">Take Photo</button>
+    </div>
+
+    <div class="media-capture">
+        <video autoplay=""></video>
+        <canvas></canvas>
+        <img>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+
+</body>
+</html>
