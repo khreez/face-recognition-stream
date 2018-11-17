@@ -2,10 +2,13 @@ import os
 import cv2
 import argparse
 import time
+import requests
+import tempfile
 
+from base64 import b64encode
 from imutils.video import VideoStream
 
-CAPTURE_DIR = 'capture'
+API_URL = 'http://localhost:5000/upload'
 
 source_sample_count = 0
 message_color = (0, 0, 255)
@@ -15,10 +18,6 @@ ap.add_argument("-i", "--identifier", required=True, help="name or class identif
 args = vars(ap.parse_args())
 
 label = args["identifier"]
-
-label_path = os.path.join(CAPTURE_DIR, label)
-if not os.path.exists(label_path):
-    os.makedirs(label_path)
 
 vs = VideoStream(src=0).start()
 time.sleep(2.0)
@@ -33,13 +32,20 @@ while True:
     key = cv2.waitKey(1) & 0xFF
 
     if key == ord("c"):
-        destination_file = os.path.sep.join([CAPTURE_DIR, label, "{}.jpg".format(str(source_sample_count).zfill(5))])
+        destination_file = os.path.join(tempfile.gettempdir(), "{}-{}.jpg".format(label, int(time.time())))
         cv2.imwrite(destination_file, source)
+
+        payload = {
+            'image': b64encode(open(destination_file, 'rb').read()),
+            'label': label
+        }
+        requests.post(API_URL, data=payload)
+
         source_sample_count += 1
 
-        capture_message = 'Captured face image sample'
+        capture_message = 'Captured face image sample for: {}'.format(label)
         print(capture_message)
-        # cv2.putText(frame, message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
+        cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
         time.sleep(2.0)
 
     elif key == ord("q"):
