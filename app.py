@@ -35,9 +35,10 @@ def _process_image(encoded_image, label):
     filename = '{}-{}.jpg'.format(label, int(time.time()))
     image_path = os.path.join(app.config['CAPTURE_DIR'], label, filename)
     print('processing image capture for: {}'.format(label))
+    decoded_image = b64decode(encoded_image.encode(), validate=True)
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
     with open(image_path, "wb") as f:
-        f.write(b64decode(encoded_image.encode(), validate=True))
+        f.write(decoded_image)
     print('image stored successfully, requesting facial augmentation for {}'.format(image_path))
     generate_facial_augmentation(image_path, label)
 
