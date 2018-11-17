@@ -1,4 +1,5 @@
 import os
+import time
 
 from base64 import decodebytes
 from flask import Flask, redirect, render_template, request, url_for
@@ -24,11 +25,17 @@ def upload():
     encoded_image = request.form['image']
     label = request.form['label']
     if encoded_image and label:
-        file_path = os.path.join(app.config['CAPTURE_DIR'], '{}.jpg'.format(label))
-        with open(file_path, "wb") as f:
-            f.write(decodebytes(encoded_image))
-        # return redirect(url_for('index'))
-    return redirect(url_for('index'))
+        _save_image(encoded_image, label)
+        return redirect(url_for('index'))
+    return redirect(url_for('index')), 400
+
+
+def _save_image(encoded_image, label):
+    filename = '{}-{}.jpg'.format(label, int(time.time()))
+    file_path = os.path.join(app.config['CAPTURE_DIR'], label, filename)
+    os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    with open(file_path, "wb") as f:
+        f.write(decodebytes(encoded_image.encode()))
 
 
 def _is_allowed_file(filename):

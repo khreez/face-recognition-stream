@@ -34,6 +34,7 @@ function onTakePhotoButtonClick() {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/upload');
             xhr.onreadystatechange = function () {
+                // error handling?
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     console.log('image sent successfully');
                 }
