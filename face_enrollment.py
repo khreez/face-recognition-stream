@@ -39,7 +39,7 @@ def generate_facial_augmentation(image_path, label):
     augmented_sample_count = 0
     image_array = process_image(image_path)
     if image_array is not None:
-        print('Processing image file: {} into: {}'.format(image_path, target_dir))
+        print('processing image file: {} into: {}'.format(image_path, target_dir))
         for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
             augmented_sample_count += 1
             if augmented_sample_count > min_samples_count:
@@ -72,14 +72,17 @@ def process_image(image_path):
 
 
 def post_process(source_path):
+    print('post-processing {}'.format(source_path))
     target_path = source_path.replace(CAPTURE_DIR, VAULT_DIR)
-    print('Post-processing {}, moving to: {}'.format(source_path, target_path))
+    os.makedirs(os.path.dirname(target_path), exist_ok=True)
+    print('moving to: {}'.format(target_path))
     shutil.copyfile(source_path, target_path)
     os.remove(source_path)
 
 
 def conditionally_create_dir(path):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 if __name__ == '__main__':
