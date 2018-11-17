@@ -4,6 +4,7 @@ __pycache__/
 results/
 capture/
 augmented/
+vault/
 
 .DS_Store
 encoded_faces.pickle
