@@ -1,13 +1,13 @@
 import os
 import shutil
 
-from datetime import datetime
 from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from tqdm import tqdm
 
 CAPTURE_DIR = 'capture'
 AUGMENTED_DIR = 'augmented'
 VAULT_DIR = 'vault'
+min_samples_count = 500
 
 datagen = ImageDataGenerator(
     rotation_range=40,
@@ -40,11 +40,9 @@ def generate_facial_augmentation(image_path, label):
     image_array = process_image(image_path)
     if image_array is not None:
         print('Processing image file: {} into: {}'.format(image_path, target_dir))
-        prefix = '{}-{:%Y%m%d%H%M%S%f}'.format(label, datetime.utcnow())
-        for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=prefix,
-                              save_format='jpeg'):
+        for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
             augmented_sample_count += 1
-            if augmented_sample_count > 1:  # 500
+            if augmented_sample_count > min_samples_count:
                 break
 
     if augmented_sample_count > 0:
@@ -81,8 +79,7 @@ def post_process(source_path):
 
 
 def conditionally_create_dir(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
 if __name__ == '__main__':
