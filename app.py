@@ -1,8 +1,9 @@
 import os
 import time
 
-from base64 import decodebytes
+from base64 import b64decode
 from flask import Flask, redirect, render_template, request, url_for
+from face_enrollment import generate_facial_augmentation
 
 CAPTURE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'capture')
 
@@ -24,22 +25,28 @@ def index():
 def upload():
     encoded_image = request.form['image']
     label = request.form['label']
-    if encoded_image and label:
-        _save_image(encoded_image, label)
+    if _is_allowed_image(encoded_image) and label:
+        _process_image(encoded_image, label)
         return redirect(url_for('index'))
     return redirect(url_for('index')), 400
 
 
-def _save_image(encoded_image, label):
+def _process_image(encoded_image, label):
     filename = '{}-{}.jpg'.format(label, int(time.time()))
-    file_path = os.path.join(app.config['CAPTURE_DIR'], label, filename)
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)
-    with open(file_path, "wb") as f:
-        f.write(decodebytes(encoded_image.encode()))
+    image_path = os.path.join(app.config['CAPTURE_DIR'], label, filename)
+    print('processing image capture for: {}'.format(label))
+    os.makedirs(os.path.dirname(image_path), exist_ok=True)
+    with open(image_path, "wb") as f:
+        f.write(b64decode(encoded_image.encode(), validate=True))
+    print('image stored successfully, requesting facial augmentation for {}'.format(image_path))
+    generate_facial_augmentation(image_path, label)
 
 
-def _is_allowed_file(filename):
-    return any(extension in filename.lower() for extension in ALLOWED_EXTENSIONS)
+def _is_allowed_image(encoded_image):
+    # TODO image verification
+    # file_extension = None
+    # allowed_extension = any(extension in file_extension for extension in ALLOWED_EXTENSIONS)
+    return encoded_image is not None
 
 
 if __name__ == '__main__':
