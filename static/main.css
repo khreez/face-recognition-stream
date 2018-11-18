@@ -6,7 +6,7 @@ h1 {
     text-align: center;
 }
 
-video, canvas, img {
+video, canvas {
     background-color: #ccc;
     margin: 5px;
     width: 100%;

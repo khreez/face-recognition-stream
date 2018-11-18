@@ -35,6 +35,7 @@ while True:
         destination_file = os.path.join(tempfile.gettempdir(), "{}-{}.jpg".format(label, int(time.time())))
         cv2.imwrite(destination_file, source)
 
+        # TODO need to pass multipart img
         payload = {
             'image': b64encode(open(destination_file, 'rb').read()),
             'label': label

@@ -2,8 +2,8 @@
 
 /* globals ImageCapture */
 
-var imageCapture;
-var mediaStream;
+let imageCapture;
+let mediaStream;
 
 navigator.mediaDevices.getUserMedia({video: true})
     .then(stream => {
@@ -16,22 +16,17 @@ navigator.mediaDevices.getUserMedia({video: true})
 function onTakePhotoButtonClick() {
     imageCapture.takePhoto()
         .then(blob => {
-            const img = document.querySelector('img');
-            img.src = URL.createObjectURL(blob);
-
-            return createImageBitmap(blob);
-        })
-        .then(imageBitmap => {
             const canvas = document.querySelector('canvas');
-            drawCanvas(canvas, imageBitmap);
+            createImageBitmap(blob, {resizeQuality: "high", resizeWidth: 800, resizeHeight: 600})
+                .then(imageBitmap => drawCanvas(canvas, imageBitmap));
 
-            const label = document.querySelector('#labelField');
+            let label = document.querySelector('#labelField').value;
 
-            var fd = new FormData();
-            fd.append('image', canvas.toDataURL('image/jpeg'));
-            fd.append('label', label.value);
+            const fd = new FormData();
+            fd.append('image', blob, label + '.jpg');
+            fd.append('label', label);
 
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.open('POST', '/upload');
             xhr.onreadystatechange = function () {
                 // error handling?
