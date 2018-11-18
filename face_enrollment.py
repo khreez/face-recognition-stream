@@ -5,7 +5,7 @@ from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from tqdm import tqdm
 
 CAPTURE_DIR = 'capture'
-AUGMENTED_DIR = 'augmented'
+TRAINING_DIR = 'training'
 VAULT_DIR = 'vault'
 min_samples_count = 500
 
@@ -33,7 +33,7 @@ def process_face_captures():
 
 
 def generate_facial_augmentation(image_path, label):
-    target_dir = os.path.join(AUGMENTED_DIR, label)
+    target_dir = os.path.join(TRAINING_DIR, label)
     conditionally_create_dir(target_dir)
 
     augmented_sample_count = 0
