@@ -19,19 +19,6 @@ datagen = ImageDataGenerator(
     horizontal_flip=True)
 
 
-def process_face_captures():
-    print('Processing capture face image(s)')
-
-    for label in get_labels():
-        print('Processing captured image(s) for label: {}'.format(label))
-
-        label_dir = os.path.join(CAPTURE_DIR, label)
-
-        for image_file_name in tqdm(os.listdir(label_dir)):
-            image_path = os.path.join(label_dir, image_file_name)
-            generate_facial_augmentation(image_path, label)
-
-
 def generate_facial_augmentation(image_path, label):
     target_dir = os.path.join(TRAINING_DIR, label)
     conditionally_create_dir(target_dir)
@@ -51,6 +38,19 @@ def generate_facial_augmentation(image_path, label):
         post_process(image_path)
     else:
         print('No augmented sample face image generated for: {}'.format(label))
+
+
+def process_face_captures():
+    print('Processing capture face image(s)')
+
+    for label in get_labels():
+        print('Processing captured image(s) for label: {}'.format(label))
+
+        label_dir = os.path.join(CAPTURE_DIR, label)
+
+        for image_file_name in tqdm(os.listdir(label_dir)):
+            image_path = os.path.join(label_dir, image_file_name)
+            generate_facial_augmentation(image_path, label)
 
 
 def get_labels():
