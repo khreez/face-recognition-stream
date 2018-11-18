@@ -9,53 +9,54 @@ from base64 import b64encode
 from imutils.video import VideoStream
 
 API_URL = 'http://localhost:5000/upload'
+MESSAGE_COLOR = (0, 0, 255)
 
-source_sample_count = 0
-message_color = (0, 0, 255)
 
-ap = argparse.ArgumentParser()
-ap.add_argument("-i", "--identifier", required=True, help="name or class identifier")
-args = vars(ap.parse_args())
+def capture_stream(args):
+    label = args["identifier"]
+    source_sample_count = 0
+    vs = VideoStream(src=0).start()
+    time.sleep(2.0)
 
-label = args["identifier"]
+    while True:
+        frame = vs.read()
+        source = frame.copy()
 
-vs = VideoStream(src=0).start()
-time.sleep(2.0)
+        frame_message = 'Face enrollment mode'
+        cv2.putText(frame, frame_message, (1, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, MESSAGE_COLOR, 2)
+        cv2.imshow(frame_message, frame)
+        key = cv2.waitKey(1) & 0xFF
 
-while True:
-    frame = vs.read()
-    source = frame.copy()
+        if key == ord("c"):
+            destination_file = os.path.join(tempfile.gettempdir(), "{}-{}.jpg".format(label, int(time.time())))
+            cv2.imwrite(destination_file, source)
 
-    frame_message = 'Face enrollment mode'
-    cv2.putText(frame, frame_message, (1, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
-    cv2.imshow(frame_message, frame)
-    key = cv2.waitKey(1) & 0xFF
+            # TODO need to pass multipart img
+            payload = {
+                'image': b64encode(open(destination_file, 'rb').read()),
+                'label': label
+            }
+            requests.post(API_URL, data=payload)
 
-    if key == ord("c"):
-        destination_file = os.path.join(tempfile.gettempdir(), "{}-{}.jpg".format(label, int(time.time())))
-        cv2.imwrite(destination_file, source)
+            source_sample_count += 1
 
-        # TODO need to pass multipart img
-        payload = {
-            'image': b64encode(open(destination_file, 'rb').read()),
-            'label': label
-        }
-        requests.post(API_URL, data=payload)
+            capture_message = 'Captured face image sample for: {}'.format(label)
+            print(capture_message)
+            cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, MESSAGE_COLOR, 2)
+            time.sleep(2.0)
+        elif key == ord("q"):
+            cv2.destroyAllWindows()
+            vs.stop()
+            break
 
-        source_sample_count += 1
+    if source_sample_count > 0:
+        print('Took {} sample face image(s) for: {}'.format(source_sample_count, label))
+    else:
+        print('No sample face image enrolled for: {}'.format(label))
 
-        capture_message = 'Captured face image sample for: {}'.format(label)
-        print(capture_message)
-        cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, message_color, 2)
-        time.sleep(2.0)
 
-    elif key == ord("q"):
-        break
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-i", "--identifier", required=True, help="name or class identifier")
 
-cv2.destroyAllWindows()
-vs.stop()
-
-if source_sample_count > 0:
-    print('Took {} sample face image(s) for: {}'.format(source_sample_count, label))
-else:
-    print('No sample face image enrolled for: {}'.format(label))
+    capture_stream(vars(ap.parse_args()))
