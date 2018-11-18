@@ -32,10 +32,10 @@ def capture_stream():
 
             name = 'Unknown'
             if True in matches:
-                matchedIdxs = [i for (i, b) in enumerate(matches) if b]
+                matched_idxs = [i for (i, b) in enumerate(matches) if b]
                 counts = {}
 
-                for i in matchedIdxs:
+                for i in matched_idxs:
                     name = data["names"][i]
                     counts[name] = counts.get(name, 0) + 1
 
