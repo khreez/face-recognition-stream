@@ -36,7 +36,7 @@ def _process_image(image, label):
     print('processing image capture for: {}'.format(label))
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
     image.save(image_path)
-    print('image stored successfully, requesting facial augmentation for {}'.format(image_path))
+    print('image stored successfully, requesting facial enrollment for {}'.format(image_path))
     enroll_face(image_path, label)
 
 
