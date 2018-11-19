@@ -1,12 +1,14 @@
 import os
 import shutil
+import argparse
 
-from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
+from keras.preprocessing.image import ImageDataGenerator
+from face_recognition import face_locations, load_image_file
+from face_encoding import encode_faces
 from tqdm import tqdm
 
 CAPTURE_DIR = 'capture'
 TRAINING_DIR = 'training'
-VAULT_DIR = 'vault'
 min_samples_count = 500
 
 datagen = ImageDataGenerator(
@@ -19,41 +21,50 @@ datagen = ImageDataGenerator(
     horizontal_flip=True)
 
 
-def generate_facial_augmentation(image_path, label):
+def enroll_faces():
+    print('enrolling captured face image(s)')
+
+    count = 0
+    for label in _get_labels():
+        label_dir = os.path.join(CAPTURE_DIR, label)
+
+        for image_file_name in os.listdir(label_dir):
+            image_path = os.path.join(label_dir, image_file_name)
+            _augment_image(image_path, label)
+            _post_process(image_path)
+
+    encode_faces()
+
+    print('enrolled {} face image(s)'.format(count))
+
+
+def enroll_face(image_path, label):
+    _augment_image(image_path, label)
+    _post_process(image_path)
+    encode_faces()
+
+
+def _augment_image(image_path, label):
+    print('augmenting image: {} with label: {}'.format(image_path, label))
     target_dir = os.path.join(TRAINING_DIR, label)
-    conditionally_create_dir(target_dir)
+    _conditionally_create_dir(target_dir)
 
     augmented_sample_count = 0
-    image_array = process_image(image_path)
+    image_array = _process_image(image_path)
     if image_array is not None:
-        print('processing image file: {} into: {}'.format(image_path, target_dir))
+        print('storing augmentations in: {}'.format(target_dir))
         for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
             augmented_sample_count += 1
             if augmented_sample_count > min_samples_count:
                 break
 
     if augmented_sample_count > 0:
-        print('Generated {} augmented sample face image(s) for: {} in {}'.format(augmented_sample_count, label,
-                                                                                 target_dir))
-        post_process(image_path)
+        print('generated {} augmented sample face image(s)'.format(augmented_sample_count))
     else:
         print('No augmented sample face image generated for: {}'.format(label))
 
 
-def process_face_captures():
-    print('Processing capture face image(s)')
-
-    for label in get_labels():
-        print('Processing captured image(s) for label: {}'.format(label))
-
-        label_dir = os.path.join(CAPTURE_DIR, label)
-
-        for image_file_name in tqdm(os.listdir(label_dir)):
-            image_path = os.path.join(label_dir, image_file_name)
-            generate_facial_augmentation(image_path, label)
-
-
-def get_labels():
+def _get_labels():
     labels = []
     with os.scandir(CAPTURE_DIR) as it:
         for entry in it:
@@ -62,29 +73,41 @@ def get_labels():
     return labels
 
 
-def process_image(image_path):
-    result = None
-    if image_path.endswith('.jpg'):
-        image = load_img(image_path)
-        # TODO capture face area and store that in augmentation instead of orig image
-        image_array = img_to_array(image)
-        result = image_array.reshape((1,) + image_array.shape)
-    return result
+def _process_image(image_path):
+    margin = 65
+    face_image = None
+    image = load_image_file(image_path)
+    if len(image):
+        facial_locations = face_locations(image, model='cnn')
+        if len(facial_locations):
+            top, right, bottom, left = facial_locations[0]
+            face_image = image[top - margin:bottom + margin, left - margin:right + margin]
+            face_image = face_image.reshape((1,) + face_image.shape)
+    return face_image
 
 
-def post_process(source_path):
+def _post_process(source_path):
     print('post-processing {}'.format(source_path))
-    target_path = source_path.replace(CAPTURE_DIR, VAULT_DIR)
-    os.makedirs(os.path.dirname(target_path), exist_ok=True)
-    print('moving to: {}'.format(target_path))
-    shutil.copyfile(source_path, target_path)
-    os.remove(source_path)
+    if os.path.exists(source_path):
+        target_path = source_path.replace(CAPTURE_DIR, TRAINING_DIR)
+        os.makedirs(os.path.dirname(target_path), exist_ok=True)
+        print('moving to: {}'.format(target_path))
+        shutil.copyfile(source_path, target_path)
+        os.remove(source_path)
 
 
-def conditionally_create_dir(path):
+def _conditionally_create_dir(path):
     if not os.path.exists(path):
         os.makedirs(path)
 
 
 if __name__ == '__main__':
-    process_face_captures()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--image", help="path to the input image")
+    parser.add_argument("-l", "--label", help="label for the input image")
+
+    args = vars(parser.parse_args())
+    if args['image'] and args['label']:
+        enroll_face(args['image'], args['label'])
+    else:
+        enroll_faces()
