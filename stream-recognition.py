@@ -9,12 +9,13 @@ from sms_alert import send_intruder_alert
 
 ALERT_FREQUENCY_IN_SECONDS = 60 * 1  # alert every x seconds
 ALERT_THRESHOLD = 20  # min event count to alert
+ENCODINGS_FILENAME = 'encodings/encoded_faces.pickle'
 
 
 def capture_stream():
     alert_events = 0  # events counter
     alert_last_check = 0
-    data = pickle.loads(open('./encoded_faces.pickle', 'rb').read())
+    data = pickle.loads(open(ENCODINGS_FILENAME, 'rb').read())
     stream = VideoStream(src=0).start()
 
     while True:

@@ -9,7 +9,7 @@ from tqdm import tqdm
 TRAINING_DIR = 'training'
 VAULT_DIR = 'vault'
 
-ENCODINGS_FILENAME = 'encoded_faces.pickle'
+ENCODINGS_FILENAME = 'encodings/encoded_faces.pickle'
 ENCODINGS_KEY = 'encodings'
 LABELS_KEY = 'names'
 
