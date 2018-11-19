@@ -1,6 +1,7 @@
 import os
 import pickle
 
+CAPTURE_DIR = 'capture'
 TRAINING_DIR = 'training'
 VAULT_DIR = 'vault'
 

@@ -1,17 +1,18 @@
 import os
 import time
+import utils
 
 from flask import Flask, redirect, render_template, request, url_for
 from face_enrollment import enroll_face
 
-CAPTURE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'capture')
+CAPTURE_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), utils.CAPTURE_DIR)
 
 ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg'}
 MAX_IMAGE_SIZE = 6 * 1024 * 1024
 
 app = Flask(__name__)
 app.config['ENV'] = 'development'
-app.config['CAPTURE_DIR'] = CAPTURE_DIR
+app.config['CAPTURE_DIR'] = CAPTURE_PATH
 app.config['MAX_IMAGE_SIZE'] = MAX_IMAGE_SIZE
 
 

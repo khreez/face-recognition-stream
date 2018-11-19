@@ -1,15 +1,14 @@
 import os
 import shutil
 import argparse
+import utils
 
 from keras.preprocessing.image import ImageDataGenerator
 from face_recognition import face_locations, load_image_file
 from face_encoding import encode_faces
 from tqdm import tqdm
 
-CAPTURE_DIR = 'capture'
-TRAINING_DIR = 'training'
-min_samples_count = 500
+MIN_SAMPLES_COUNT = 500
 
 datagen = ImageDataGenerator(
     rotation_range=40,
@@ -26,7 +25,7 @@ def enroll_faces():
 
     count = 0
     for label in _get_labels():
-        label_dir = os.path.join(CAPTURE_DIR, label)
+        label_dir = os.path.join(utils.CAPTURE_DIR, label)
 
         for image_file_name in os.listdir(label_dir):
             image_path = os.path.join(label_dir, image_file_name)
@@ -46,7 +45,7 @@ def enroll_face(image_path, label):
 
 def _augment_image(image_path, label):
     print('augmenting image: {} with label: {}'.format(image_path, label))
-    target_dir = os.path.join(TRAINING_DIR, label)
+    target_dir = os.path.join(utils.TRAINING_DIR, label)
     _conditionally_create_dir(target_dir)
 
     augmented_sample_count = 0
@@ -55,7 +54,7 @@ def _augment_image(image_path, label):
         print('storing augmentations in: {}'.format(target_dir))
         for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
             augmented_sample_count += 1
-            if augmented_sample_count > min_samples_count:
+            if augmented_sample_count > MIN_SAMPLES_COUNT:
                 break
 
     if augmented_sample_count > 0:
@@ -66,7 +65,7 @@ def _augment_image(image_path, label):
 
 def _get_labels():
     labels = []
-    with os.scandir(CAPTURE_DIR) as it:
+    with os.scandir(utils.CAPTURE_DIR) as it:
         for entry in it:
             if entry.is_dir():
                 labels.append(entry.name)
@@ -89,7 +88,7 @@ def _process_image(image_path):
 def _post_process(source_path):
     print('post-processing {}'.format(source_path))
     if os.path.exists(source_path):
-        target_path = source_path.replace(CAPTURE_DIR, TRAINING_DIR)
+        target_path = source_path.replace(utils.CAPTURE_DIR, utils.TRAINING_DIR)
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
         print('moving to: {}'.format(target_path))
         shutil.copyfile(source_path, target_path)
