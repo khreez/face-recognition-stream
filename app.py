@@ -2,7 +2,7 @@ import os
 import time
 
 from flask import Flask, redirect, render_template, request, url_for
-from face_enrollment import generate_facial_augmentation
+from face_enrollment import enroll_face
 
 CAPTURE_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'capture')
 
@@ -27,7 +27,7 @@ def upload():
     if _is_allowed_filename(image.filename) and label:
         _process_image(image, label)
         return redirect(url_for('index'))
-    return redirect(url_for('index')), 400
+    return redirect(request.url), 400
 
 
 def _process_image(image, label):
@@ -37,7 +37,7 @@ def _process_image(image, label):
     os.makedirs(os.path.dirname(image_path), exist_ok=True)
     image.save(image_path)
     print('image stored successfully, requesting facial augmentation for {}'.format(image_path))
-    generate_facial_augmentation(image_path, label)
+    enroll_face(image_path, label)
 
 
 def _is_allowed_filename(filename):
