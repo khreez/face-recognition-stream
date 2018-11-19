@@ -6,6 +6,7 @@ capture/
 augmented/
 vault/
 training/
+encodings/
 
 .DS_Store
 encoded_faces.pickle
