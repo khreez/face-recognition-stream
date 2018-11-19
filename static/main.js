@@ -21,6 +21,7 @@ function onTakePhotoButtonClick() {
                 .then(imageBitmap => drawCanvas(canvas, imageBitmap));
 
             let label = document.querySelector('#labelField').value;
+            label = label.toLowerCase();
 
             const fd = new FormData();
             fd.append('image', blob, label + '.jpg');
