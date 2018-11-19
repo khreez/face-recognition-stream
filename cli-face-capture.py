@@ -12,8 +12,7 @@ API_URL = 'http://localhost:5000/upload'
 MESSAGE_COLOR = (0, 0, 255)
 
 
-def capture_stream(args):
-    label = args["identifier"]
+def capture_stream(label):
     source_sample_count = 0
     vs = VideoStream(src=0).start()
     time.sleep(2.0)
@@ -27,8 +26,8 @@ def capture_stream(args):
         cv2.imshow(frame_message, frame)
         key = cv2.waitKey(1) & 0xFF
 
-        if key == ord("c"):
-            destination_file = os.path.join(tempfile.gettempdir(), "{}-{}.jpg".format(label, int(time.time())))
+        if key == ord('c'):
+            destination_file = os.path.join(tempfile.gettempdir(), '{}-{}.jpg'.format(label, int(time.time())))
             cv2.imwrite(destination_file, source)
 
             # TODO need to pass multipart img
@@ -44,7 +43,7 @@ def capture_stream(args):
             print(capture_message)
             cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, MESSAGE_COLOR, 2)
             time.sleep(2.0)
-        elif key == ord("q"):
+        elif key == ord('q'):
             cv2.destroyAllWindows()
             vs.stop()
             break
@@ -57,6 +56,7 @@ def capture_stream(args):
 
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--identifier", required=True, help="name or class identifier")
+    ap.add_argument('-l', '--label', required=True, help='name or label for the image')
+    args = vars(ap.parse_args())
 
-    capture_stream(vars(ap.parse_args()))
+    capture_stream(args['label'])
