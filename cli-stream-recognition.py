@@ -1,21 +1,21 @@
 import face_recognition
 import imutils
-import pickle
 import cv2
 import time
+import utils
 
 from imutils.video import VideoStream
 from sms_alert import send_intruder_alert
 
 ALERT_FREQUENCY_IN_SECONDS = 60 * 1  # alert every x seconds
 ALERT_THRESHOLD = 20  # min event count to alert
-ENCODINGS_FILENAME = 'encodings/encoded_faces.pickle'
 
 
 def capture_stream():
     alert_events = 0  # events counter
     alert_last_check = 0
-    data = pickle.loads(open(ENCODINGS_FILENAME, 'rb').read())
+    known_encodings, known_labels = utils.load_source_encodings()
+
     stream = VideoStream(src=0).start()
 
     while True:
@@ -29,7 +29,6 @@ def capture_stream():
 
         names = []
         for encoding in encodings:
-            known_encodings = data['encodings']
             matches = face_recognition.compare_faces(known_encodings, encoding, 0.5)
 
             name = 'Unknown'
@@ -38,7 +37,7 @@ def capture_stream():
                 counts = {}
 
                 for i in matched_idxs:
-                    name = data['names'][i]
+                    name = known_labels[i]
                     counts[name] = counts.get(name, 0) + 1
 
                 name = max(counts, key=counts.get)
