@@ -8,7 +8,7 @@ from face_recognition import face_locations, load_image_file
 from face_encoding import encode_faces
 from tqdm import tqdm
 
-MIN_SAMPLES_COUNT = 500
+MIN_SAMPLES_COUNT = 250
 
 datagen = ImageDataGenerator(
     rotation_range=40,
@@ -86,11 +86,10 @@ def _process_image(image_path):
 
 
 def _post_process(source_path):
-    print('post-processing {}'.format(source_path))
     if os.path.exists(source_path):
         target_path = source_path.replace(utils.CAPTURE_DIR, utils.TRAINING_DIR)
+        print('post-processing: {} moving to: {}'.format(source_path, target_path))
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        print('moving to: {}'.format(target_path))
         shutil.copyfile(source_path, target_path)
         os.remove(source_path)
 
