@@ -51,7 +51,7 @@ def _augment_image(image_path, label):
 
     augmented_sample_count = 0
     image_array = _process_image(image_path)
-    if len(image_array) > 1:
+    if len(image_array) and image_array.shape[1] > 20 and image_array.shape[2] > 20:
         print('storing augmentations in: {}'.format(target_dir))
         for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
             if augmented_sample_count >= MIN_SAMPLES_COUNT:
