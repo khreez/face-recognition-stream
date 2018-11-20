@@ -38,6 +38,8 @@ function onTakePhotoButtonClick() {
                     let response = JSON.parse(xhr.response);
                     bitmap.then(imageBitmap => drawCanvas(canvas, imageBitmap, response.filename));
                     document.querySelector('#enrollButton').classList.remove('hidden');
+                } else {
+                    drawText(canvas, 'something went wrong, unable to capture photo');
                 }
             };
             xhr.send(fd);
@@ -53,9 +55,7 @@ function onEnrollButtonClick() {
     takePhotoButton.disabled = true;
 
     const canvas = document.querySelector('canvas');
-    let context = canvas.getContext('2d');
-    context.clearRect(0, 0, canvas.width, canvas.height);
-    context.fillText('processing facial enrollment...', 10, 10);
+    drawText(canvas, 'processing facial enrollment...');
 
     const xhr = new XMLHttpRequest();
     xhr.open('GET', '/enroll');
@@ -64,8 +64,9 @@ function onEnrollButtonClick() {
         takePhotoButton.disabled = false;
         if (xhr.readyState === 4 && xhr.status === 200) {
             let response = JSON.parse(xhr.response);
-            context.clearRect(0, 0, canvas.width, canvas.height);
-            context.fillText(response.message, 10, 10);
+            drawText(canvas, response.message);
+        } else {
+            drawText(canvas, 'something went wrong, unable complete facial enrollment')
         }
     };
     xhr.send();
@@ -82,6 +83,12 @@ function drawCanvas(canvas, img, filename) {
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(img, 0, 0, img.width, img.height, x, y, img.width * ratio, img.height * ratio);
     context.fillText(filename, 10, 10);
+}
+
+function drawText(canvas, message) {
+    let context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.fillText(message, 10, 10);
 }
 
 document.querySelector('#takePhotoButton').addEventListener('click', onTakePhotoButtonClick);
