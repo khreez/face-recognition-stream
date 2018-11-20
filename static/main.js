@@ -82,12 +82,14 @@ function drawCanvas(canvas, img, filename) {
     let context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.drawImage(img, 0, 0, img.width, img.height, x, y, img.width * ratio, img.height * ratio);
+    context.font = '24px sans-serif';
     context.fillText(filename, 10, 10);
 }
 
 function drawText(canvas, message) {
     let context = canvas.getContext('2d');
     context.clearRect(0, 0, canvas.width, canvas.height);
+    context.font = '24px sans-serif';
     context.fillText(message, 10, 10);
 }
 
