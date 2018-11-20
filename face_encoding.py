@@ -60,10 +60,9 @@ def _serialize_encodings(encodings, labels):
 
 def _post_process():
     for image_path in paths.list_images(utils.TRAINING_DIR):
-        print('post-processing {}'.format(image_path))
         target_path = os.path.join(utils.VAULT_DIR, image_path)
+        print('post-processing: {} moving to: {}'.format(image_path, target_path))
         os.makedirs(os.path.dirname(target_path), exist_ok=True)
-        print('moving to: {}'.format(target_path))
         shutil.copyfile(image_path, target_path)
         os.remove(image_path)
 

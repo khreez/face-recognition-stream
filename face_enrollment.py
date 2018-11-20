@@ -28,6 +28,7 @@ def enroll_faces():
         label_dir = os.path.join(utils.CAPTURE_DIR, label)
 
         for image_file_name in os.listdir(label_dir):
+            count += 1
             image_path = os.path.join(label_dir, image_file_name)
             _augment_image(image_path, label)
             _post_process(image_path)

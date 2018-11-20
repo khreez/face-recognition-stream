@@ -4,8 +4,9 @@ import pickle
 CAPTURE_DIR = 'capture'
 TRAINING_DIR = 'training'
 VAULT_DIR = 'vault'
+ENCODINGS_DIR = 'encodings'
 
-ENCODINGS_FILENAME = 'encodings/encoded_faces.pickle'
+ENCODINGS_FILENAME = ENCODINGS_DIR + '/encoded_faces.pickle'
 ENCODINGS_KEY = 'encodings'
 LABELS_KEY = 'names'
 
