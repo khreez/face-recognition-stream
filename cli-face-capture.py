@@ -5,7 +5,6 @@ import time
 import requests
 import tempfile
 
-from base64 import b64encode
 from imutils.video import VideoStream
 
 API_URL = 'http://localhost:5000/upload'
@@ -30,19 +29,21 @@ def capture_stream(label):
             destination_file = os.path.join(tempfile.gettempdir(), '{}-{}.jpg'.format(label, int(time.time())))
             cv2.imwrite(destination_file, source)
 
-            # TODO need to pass multipart img
-            payload = {
-                'image': b64encode(open(destination_file, 'rb').read()),
-                'label': label
-            }
-            requests.post(API_URL, data=payload)
+            try:
+                response = requests.post(API_URL, files={'image': open(destination_file, 'rb')}, data={'label': label})
 
-            source_sample_count += 1
+                if response and response.ok:
+                    source_sample_count += 1
+                    capture_message = 'Captured face image sample for: {}'.format(label)
+                    print(capture_message)
+                    cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, MESSAGE_COLOR, 2)
+                    time.sleep(2.0)
+                else:
+                    print('unable to submit face capture')
 
-            capture_message = 'Captured face image sample for: {}'.format(label)
-            print(capture_message)
-            cv2.putText(frame, capture_message, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.75, MESSAGE_COLOR, 2)
-            time.sleep(2.0)
+            except requests.RequestException:
+                print('unreachable endpoint')
+
         elif key == ord('q'):
             cv2.destroyAllWindows()
             vs.stop()
