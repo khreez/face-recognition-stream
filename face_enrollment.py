@@ -51,12 +51,12 @@ def _augment_image(image_path, label):
 
     augmented_sample_count = 0
     image_array = _process_image(image_path)
-    if image_array is not None:
+    if len(image_array) > 1:
         print('storing augmentations in: {}'.format(target_dir))
         for _ in datagen.flow(image_array, batch_size=1, save_to_dir=target_dir, save_prefix=label, save_format='jpeg'):
-            augmented_sample_count += 1
-            if augmented_sample_count > MIN_SAMPLES_COUNT:
+            if augmented_sample_count >= MIN_SAMPLES_COUNT:
                 break
+            augmented_sample_count += 1
 
     if augmented_sample_count > 0:
         print('generated {} augmented sample face image(s)'.format(augmented_sample_count))
@@ -75,15 +75,28 @@ def _get_labels():
 
 def _process_image(image_path):
     margin = 65
-    face_image = None
+    face_image_array = []
     image = load_image_file(image_path)
     if len(image):
         facial_locations = face_locations(image, model='cnn')
         if len(facial_locations):
             top, right, bottom, left = facial_locations[0]
-            face_image = image[top - margin:bottom + margin, left - margin:right + margin]
-            face_image = face_image.reshape((1,) + face_image.shape)
-    return face_image
+
+            top_min = min(top, top - margin)
+            top_min = top_min if top_min >= 0 else 0
+
+            left_min = min(left, left - margin)
+            left_min = left_min if left_min >= 0 else 0
+
+            bottom_max = max(bottom, bottom + margin)
+            bottom_max = bottom_max if bottom_max <= bottom else bottom
+
+            right_max = max(right, right + margin)
+            right_max = right_max if right_max <= right else right
+
+            face_image_array = image[top_min:bottom_max, left_min:right_max]
+            face_image_array = face_image_array.reshape((1,) + face_image_array.shape)
+    return face_image_array
 
 
 def _post_process(source_path):
