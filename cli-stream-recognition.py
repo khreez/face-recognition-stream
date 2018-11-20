@@ -5,16 +5,30 @@ import time
 import utils
 
 from imutils.video import VideoStream
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 from sms_alert import send_intruder_alert
 
 ALERT_FREQUENCY_IN_SECONDS = 60 * 1  # alert every x seconds
 ALERT_THRESHOLD = 20  # min event count to alert
 
+KNOWN_ENCODINGS, KNOWN_LABELS = utils.load_source_encodings()
+
+
+class ModifiedEncodingsHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        print('updating encodings due to detected modification')
+        global KNOWN_ENCODINGS, KNOWN_LABELS
+        KNOWN_ENCODINGS, KNOWN_LABELS = utils.load_source_encodings()
+
 
 def capture_stream():
     alert_events = 0  # events counter
     alert_last_check = 0
-    known_encodings, known_labels = utils.load_source_encodings()
+
+    observer = Observer()
+    observer.schedule(ModifiedEncodingsHandler(), path=utils.ENCODINGS_DIR)
+    observer.start()
 
     stream = VideoStream(src=0).start()
 
@@ -29,7 +43,7 @@ def capture_stream():
 
         names = []
         for encoding in encodings:
-            matches = face_recognition.compare_faces(known_encodings, encoding, 0.5)
+            matches = face_recognition.compare_faces(KNOWN_ENCODINGS, encoding, 0.5)
 
             name = 'Unknown'
             if True in matches:
@@ -37,7 +51,7 @@ def capture_stream():
                 counts = {}
 
                 for i in matched_idxs:
-                    name = known_labels[i]
+                    name = KNOWN_LABELS[i]
                     counts[name] = counts.get(name, 0) + 1
 
                 name = max(counts, key=counts.get)
@@ -79,7 +93,10 @@ def capture_stream():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             stream.stop()
+            observer.stop()
             break
+
+    observer.join()
 
 
 if __name__ == '__main__':
