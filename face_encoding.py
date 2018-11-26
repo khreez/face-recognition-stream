@@ -30,7 +30,7 @@ def _process_face_encodings(image_path):
     print('processing facial encodings for {}'.format(image_path))
 
     image = load_image_file(image_path)
-    facial_locations = face_locations(image, model='cnn')
+    facial_locations = face_locations(image, model='hog')
     return face_encodings(image, facial_locations)
 
 
