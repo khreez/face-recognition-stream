@@ -49,6 +49,7 @@ def _process_encodings(encodings, labels):
 
 def _serialize_encodings(encodings, labels):
     if len(encodings) and len(labels):
+        os.makedirs(utils.ENCODINGS_DIR, exist_ok=True)
         with open(utils.ENCODINGS_FILENAME, 'wb') as f:
             f.write(pickle.dumps({
                 utils.ENCODINGS_KEY: encodings,
